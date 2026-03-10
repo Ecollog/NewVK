@@ -1,0 +1,192 @@
+﻿/* Палитра: 6B5240-C9BCA4-B5C1B1-ECF2F1-383E44 */
+
+:root {
+    --c-primary: #6B5240;
+    --c-sand: #C9BCA4;
+    --c-sage: #B5C1B1;
+    --c-bg: #ECF2F1;
+    --c-text: #383E44;
+    --radius: 18px;
+    --radius-sm: 12px;
+    --shadow: 0 10px 30px rgba(56,62,68,.12);
+}
+
+/* ВАЖНО: align-items:flex-start — карточка больше не “прыгает” при изменении высоты */
+.auth-wrap {
+    min-height: calc(100vh - 120px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 48px 24px 24px;
+}
+
+.auth-card {
+    width: min(560px, 100%);
+    background: rgba(236,242,241,.85);
+    border: 1px solid rgba(201,188,164,.65);
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+}
+
+.auth-title {
+    margin: 0 0 14px 0;
+    font-size: 26px;
+    color: var(--c-text);
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding: 6px;
+    border-radius: var(--radius);
+    background: rgba(201,188,164,.28);
+    border: 1px solid rgba(201,188,164,.5);
+}
+
+.tab {
+    flex: 1;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--c-text);
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 800;
+    transition: background .15s ease, color .15s ease, transform .08s ease;
+}
+
+    .tab:hover {
+        background: rgba(181,193,177,.28);
+    }
+
+    .tab:active {
+        transform: translateY(1px);
+    }
+
+    .tab.active {
+        background: var(--c-primary);
+        color: #fff;
+    }
+
+.field {
+    margin: 12px 0;
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 800;
+    color: var(--c-text);
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="tel"] {
+    width: 100%;
+    padding: 11px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(201,188,164,.75);
+    background: rgba(236,242,241,.95);
+    color: var(--c-text);
+    outline: none;
+}
+
+input:focus {
+    border-color: rgba(181,193,177,.95);
+    box-shadow: 0 0 0 4px rgba(181,193,177,.28);
+    background: #fff;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.hidden-row {
+    display: none;
+}
+
+.check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: rgba(56,62,68,.95);
+}
+
+    .check input {
+        accent-color: var(--c-primary);
+    }
+
+.btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px 14px;
+    border: 1px solid rgba(56,62,68,.15);
+    border-radius: 14px;
+    background: var(--c-primary);
+    color: #fff;
+    cursor: pointer;
+    font-weight: 900;
+}
+
+    .btn:active {
+        transform: translateY(1px);
+    }
+
+.val {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #7a1f1f;
+}
+
+.alert {
+    margin: 10px 0;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(201,188,164,.6);
+}
+
+    .alert.error {
+        background: rgba(201,188,164,.25);
+        color: var(--c-text);
+    }
+
+    .alert.success {
+        background: rgba(181,193,177,.35);
+        color: var(--c-text);
+    }
+
+/* Регистрация раскрывается вниз, без смены верхних полей */
+.reg-extra {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+    transition: max-height .25s ease, opacity .25s ease, margin-top .25s ease;
+}
+
+    .reg-extra.open {
+        max-height: 2000px; /* просто запас */
+        opacity: 1;
+        margin-top: 12px;
+    }
+
+@media (max-width:520px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}

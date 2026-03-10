@@ -1,0 +1,110 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Вход / Регистрация";
+}
+
+<div class="auth-wrap">
+    <div class="auth-card">
+        <h1 class="auth-title">Аккаунт</h1>
+
+        <div class="tabs">
+            <button id="tab-login" type="button"
+                    class="tab @(Model.Auth.Mode == "login" ? "active" : "")"
+                    onclick="switchMode('login')">
+                Вход
+            </button>
+
+            <button id="tab-register" type="button"
+                    class="tab @(Model.Auth.Mode == "register" ? "active" : "")"
+                    onclick="switchMode('register')">
+                Регистрация
+            </button>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+        {
+            <div class="alert success">@Model.SuccessMessage</div>
+        }
+
+        <div asp-validation-summary="ModelOnly" class="alert error"></div>
+
+        <form id="auth-form" method="post" asp-page-handler="Submit" novalidate>
+            <input asp-for="Auth.Mode" type="hidden" id="mode" />
+
+            <div class="field">
+                <label asp-for="Auth.Login"></label>
+                <input asp-for="Auth.Login" autocomplete="username" placeholder="Логин (можно email для входа)" />
+                <span asp-validation-for="Auth.Login" class="val"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="Auth.Password"></label>
+                <input asp-for="Auth.Password" autocomplete="current-password" />
+                <span asp-validation-for="Auth.Password" class="val"></span>
+            </div>
+
+            <div class="row @(Model.Auth.Mode == "login" ? "" : "hidden-row")" id="remember-row">
+                <label class="check">
+                    <input asp-for="Auth.RememberMe" />
+                    Запомнить меня
+                </label>
+            </div>
+
+            <div id="reg-extra" class="reg-extra @(Model.Auth.Mode == "register" ? "open" : "")">
+                <div class="grid">
+                    <div class="field">
+                        <label asp-for="Auth.FirstName"></label>
+                        <input asp-for="Auth.FirstName" autocomplete="given-name" />
+                        <span asp-validation-for="Auth.FirstName" class="val"></span>
+                    </div>
+
+                    <div class="field">
+                        <label asp-for="Auth.LastName"></label>
+                        <input asp-for="Auth.LastName" autocomplete="family-name" />
+                        <span asp-validation-for="Auth.LastName" class="val"></span>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label asp-for="Auth.Email"></label>
+                    <input asp-for="Auth.Email" autocomplete="email" />
+                    <span asp-validation-for="Auth.Email" class="val"></span>
+                </div>
+
+                <div class="field">
+                    <label asp-for="Auth.Phone"></label>
+                    <input asp-for="Auth.Phone" autocomplete="tel" />
+                    <span asp-validation-for="Auth.Phone" class="val"></span>
+                </div>
+
+                <div class="field">
+                    <label asp-for="Auth.ConfirmPassword"></label>
+                    <input asp-for="Auth.ConfirmPassword" autocomplete="new-password" />
+                    <span asp-validation-for="Auth.ConfirmPassword" class="val"></span>
+                </div>
+
+                <div class="row">
+                    <label class="check">
+                        <input asp-for="Auth.AcceptTerms" />
+                        Я принимаю условия
+                    </label>
+                    <span asp-validation-for="Auth.AcceptTerms" class="val"></span>
+                </div>
+            </div>
+
+            <button class="btn" id="submit-btn" type="submit">
+                @(Model.Auth.Mode == "register" ? "Зарегистрироваться" : "Войти")
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/auth.js" asp-append-version="true"></script>
+}

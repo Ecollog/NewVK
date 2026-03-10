@@ -1,0 +1,39 @@
+﻿:root {
+    --c-primary: #6B5240;
+    --c-sand: #C9BCA4;
+    --c-sage: #B5C1B1;
+    --c-bg: #ECF2F1;
+    --c-text: #383E44;
+    --radius: 18px;
+    --radius-sm: 12px;
+    --shadow: 0 10px 30px rgba(56,62,68,.12);
+    --shadow-soft: 0 6px 18px rgba(56,62,68,.10);
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    background: var(--c-bg);
+    color: var(--c-text);
+}
+
+/* Небольшая “подстройка” bootstrap под палитру (не ломает bootstrap, только оттенки) */
+a {
+    color: var(--c-primary);
+}
+
+    a:hover {
+        color: #5a4435;
+    }
+
+::selection {
+    background: rgba(107,82,64,.22);
+}
+
+/* Красивый фокус для инпутов */
+:focus-visible {
+    outline: 3px solid rgba(181,193,177,.55);
+    outline-offset: 2px;
+}
