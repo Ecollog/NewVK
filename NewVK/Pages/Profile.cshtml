@@ -2,45 +2,176 @@
 @model NewVK.Pages.ProfileModel
 @{
     ViewData["Title"] = "Профиль";
+
+    var fullName = $"{Model.FirstName} {Model.LastName}".Trim();
+    if (string.IsNullOrWhiteSpace(fullName))
+    {
+        fullName = Model.Login;
+    }
+
+    var firstInitial = !string.IsNullOrWhiteSpace(Model.FirstName) ? Model.FirstName[0].ToString().ToUpper() : "";
+    var lastInitial = !string.IsNullOrWhiteSpace(Model.LastName) ? Model.LastName[0].ToString().ToUpper() : "";
+    var avatarText = $"{firstInitial}{lastInitial}";
+    if (string.IsNullOrWhiteSpace(avatarText))
+    {
+        avatarText = !string.IsNullOrWhiteSpace(Model.Login)
+            ? Model.Login.Substring(0, 1).ToUpper()
+            : "U";
+    }
 }
 
-<div class="auth-wrap">
-    <div class="auth-card">
-        <h1 class="auth-title">Профиль</h1>
+<div class="profile-page">
+    <div class="profile-shell">
 
-        <div class="field">
-            <label>Логин</label>
-            <input value="@Model.Login" readonly />
-        </div>
+        <section class="profile-hero">
+            <div class="profile-cover"></div>
 
-        <div class="grid">
-            <div class="field">
-                <label>Имя</label>
-                <input value="@Model.FirstName" readonly />
+            <div class="profile-main">
+                <div class="profile-avatar">@avatarText</div>
+
+                <div class="profile-head-content">
+                    <div class="profile-name-row">
+                        <div>
+                            <h1 class="profile-name">@fullName</h1>
+                            <div class="profile-login">@@@Model.Login</div>
+                        </div>
+
+                        <div class="profile-actions">
+                            <a href="#" class="btn btn-light">Редактировать</a>
+                            <a href="#" class="btn btn-outline">Сообщение</a>
+                        </div>
+                    </div>
+
+                    <p class="profile-status">
+                        Добро пожаловать в профиль. Здесь может быть краткое описание пользователя,
+                        его интересов, статус или любая публичная информация.
+                    </p>
+
+                    <div class="profile-stats">
+                        <div class="stat-card">
+                            <div class="stat-value">248</div>
+                            <div class="stat-label">Друзей</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">54</div>
+                            <div class="stat-label">Фото</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">19</div>
+                            <div class="stat-label">Подписок</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">6</div>
+                            <div class="stat-label">Постов</div>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </section>
 
-            <div class="field">
-                <label>Фамилия</label>
-                <input value="@Model.LastName" readonly />
-            </div>
+        <div class="profile-content">
+            <aside class="profile-sidebar">
+                <div class="info-card">
+                    <h2 class="card-title">Основная информация</h2>
+
+                    <div class="info-list">
+                        <div class="info-row">
+                            <span class="info-label">Имя</span>
+                            <span class="info-value">@Model.FirstName</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label">Фамилия</span>
+                            <span class="info-value">@Model.LastName</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label">Логин</span>
+                            <span class="info-value">@Model.Login</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label">Email</span>
+                            <span class="info-value">@Model.Email</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label">Телефон</span>
+                            <span class="info-value">@Model.Phone</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h2 class="card-title">О себе</h2>
+                    <p class="about-text">
+                        Здесь можно вывести биографию, интересы, любимую музыку, игры, фильмы,
+                        место учебы или работы. Пока это декоративный блок, но его легко
+                        подключить к базе данных.
+                    </p>
+                </div>
+
+                <div class="info-card">
+                    <form method="post" asp-page-handler="Logout">
+                        <button class="btn btn-danger btn-full" type="submit">Выйти из аккаунта</button>
+                    </form>
+                </div>
+            </aside>
+
+            <section class="profile-feed">
+                <div class="feed-card">
+                    <div class="feed-card-header">
+                        <h2 class="card-title">Последние публикации</h2>
+                        <a href="#" class="feed-link">Все записи</a>
+                    </div>
+
+                    <div class="post-card">
+                        <div class="post-top">
+                            <div class="post-mini-avatar">@avatarText</div>
+                            <div>
+                                <div class="post-author">@fullName</div>
+                                <div class="post-date">сегодня в 12:40</div>
+                            </div>
+                        </div>
+
+                        <p class="post-text">
+                            Это пример поста пользователя. Здесь можно показывать текст публикации,
+                            изображения, прикрепленные файлы, лайки и комментарии.
+                        </p>
+
+                        <div class="post-actions">
+                            <button type="button" class="post-btn">Нравится</button>
+                            <button type="button" class="post-btn">Комментировать</button>
+                            <button type="button" class="post-btn">Поделиться</button>
+                        </div>
+                    </div>
+
+                    <div class="post-card">
+                        <div class="post-top">
+                            <div class="post-mini-avatar">@avatarText</div>
+                            <div>
+                                <div class="post-author">@fullName</div>
+                                <div class="post-date">вчера в 18:05</div>
+                            </div>
+                        </div>
+
+                        <p class="post-text">
+                            Еще один демонстрационный блок. Потом сюда можно подгрузить реальные посты
+                            из БД через отдельную таблицу публикаций.
+                        </p>
+
+                        <div class="post-actions">
+                            <button type="button" class="post-btn">Нравится</button>
+                            <button type="button" class="post-btn">Комментировать</button>
+                            <button type="button" class="post-btn">Поделиться</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
-
-        <div class="field">
-            <label>Email</label>
-            <input value="@Model.Email" readonly />
-        </div>
-
-        <div class="field">
-            <label>Телефон</label>
-            <input value="@Model.Phone" readonly />
-        </div>
-
-        <form method="post" asp-page-handler="Logout">
-            <button class="btn" type="submit">Выйти</button>
-        </form>
     </div>
 </div>
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
 }
