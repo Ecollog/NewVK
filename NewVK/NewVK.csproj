@@ -7,7 +7,43 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="SQL\2 Alter_Users_AddThemeAndAbout.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>2 Alter_Users_AddThemeAndAbout.sql</DependentUpon>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="SQL\2 Alter_Users_AddThemeAndAbout.sql">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>2 Alter_Users_AddThemeAndAbout.cs</LastGenOutput>
+    </None>
+    <None Update="SQL\1 Create_NewVKDb.sql">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>1 Create_NewVKDb.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="SQL\1 Create_NewVKDb.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>1 Create_NewVKDb.sql</DependentUpon>
+    </Compile>
+    <Compile Update="SQL\2 Alter_Users_AddThemeAndAbout.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>2 Alter_Users_AddThemeAndAbout.sql</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>
