@@ -1,15 +1,25 @@
-using System.Text.Json;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using NewVK.Data;
+using NewVK.Models;
+using NewVK.Services;
 
 namespace NewVK.Pages
 {
+    [Authorize]
     public class ProfileModel : PageModel
     {
-        private const string UserCookieName = "demo_registered_user";
-        private const string AuthCookieName = "demo_auth_user";
+        private readonly UsersRepository _usersRepository;
+        private readonly CurrentUserService _currentUserService;
 
-        private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
+        public ProfileModel(UsersRepository usersRepository, CurrentUserService currentUserService)
+        {
+            _usersRepository = usersRepository;
+            _currentUserService = currentUserService;
+        }
 
         public string Login { get; private set; } = "";
         public string FirstName { get; private set; } = "";
@@ -17,11 +27,20 @@ namespace NewVK.Pages
         public string Email { get; private set; } = "";
         public string Phone { get; private set; } = "";
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
         {
-            var user = ReadAuthorizedUser();
-            if (user is null)
+            int? userId = _currentUserService.GetUserId();
+
+            if (userId is null)
                 return RedirectToPage("/Index");
+
+            AppUser? user = await _usersRepository.GetByIdAsync(userId.Value, cancellationToken);
+
+            if (user is null)
+            {
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                return RedirectToPage("/Index");
+            }
 
             Login = user.Login;
             FirstName = user.FirstName;
@@ -32,43 +51,10 @@ namespace NewVK.Pages
             return Page();
         }
 
-        public IActionResult OnPostLogout()
+        public async Task<IActionResult> OnPostLogoutAsync()
         {
-            Response.Cookies.Delete(AuthCookieName, new CookieOptions { Path = "/" });
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToPage("/Index");
-        }
-
-        private StoredUser? ReadAuthorizedUser()
-        {
-            if (!Request.Cookies.TryGetValue(AuthCookieName, out var authLogin) || string.IsNullOrWhiteSpace(authLogin))
-                return null;
-
-            if (!Request.Cookies.TryGetValue(UserCookieName, out var json) || string.IsNullOrWhiteSpace(json))
-                return null;
-
-            try
-            {
-                var user = JsonSerializer.Deserialize<StoredUser>(json, JsonOptions);
-                if (user is null)
-                    return null;
-
-                return string.Equals(user.Login, authLogin, StringComparison.OrdinalIgnoreCase)
-                    ? user
-                    : null;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        private sealed class StoredUser
-        {
-            public string Login { get; set; } = "";
-            public string FirstName { get; set; } = "";
-            public string LastName { get; set; } = "";
-            public string Email { get; set; } = "";
-            public string Phone { get; set; } = "";
         }
     }
 }
