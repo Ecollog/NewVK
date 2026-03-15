@@ -34,10 +34,12 @@ namespace NewVK
 
             builder.Services.AddScoped<AppDbConnectionFactory>();
             builder.Services.AddScoped<UsersRepository>();
+            builder.Services.AddScoped<UserPhotosRepository>();
             builder.Services.AddScoped<CurrentUserService>();
             builder.Services.AddScoped<AuthCookieService>();
             builder.Services.AddSingleton<PasswordHasher>();
             builder.Services.AddSingleton<ThemeCatalogService>();
+            
 
             var app = builder.Build();
 

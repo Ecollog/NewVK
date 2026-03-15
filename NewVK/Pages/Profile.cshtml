@@ -42,7 +42,8 @@
 
                         <div class="profile-actions">
                             <a asp-page="/EditProfile" class="btn btn-light">Редактировать</a>
-                            <a href="#" class="btn btn-outline">Сообщение</a>
+                            <a asp-page="/Messages" class="btn btn-outline">Сообщения</a>
+                            <a asp-page="/Photos" class="btn btn-outline">Фото</a>
                         </div>
                     </div>
 
@@ -108,6 +109,16 @@
                             <span class="info-value">@Model.ThemeKey</span>
                         </div>
                     </div>
+
+                    <div class="info-card">
+                        <h2 class="card-title">Разделы</h2>
+
+                        <div class="profile-actions">
+                            <a asp-page="/Messages" class="btn btn-outline">Сообщения</a>
+                            <a asp-page="/Photos" class="btn btn-outline">Фото</a>
+                            <a asp-page="/EditProfile" class="btn btn-outline">Редактировать профиль</a>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="info-card">
@@ -170,6 +181,7 @@
                             <button type="button" class="post-btn">Нравится</button>
                             <button type="button" class="post-btn">Комментировать</button>
                             <button type="button" class="post-btn">Поделиться</button>
+
                         </div>
                     </div>
                 </div>

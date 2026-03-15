@@ -1,0 +1,117 @@
+﻿@page
+@model NewVK.Pages.PhotosModel
+@{
+    ViewData["Title"] = "Мои фото";
+    var avatarLetter = string.IsNullOrWhiteSpace(Model.CurrentUserName) ? "U" : Model.CurrentUserName.Substring(0, 1).ToUpper();
+}
+
+<div class="photos-page">
+    <div class="photos-shell">
+
+        <section class="photos-hero">
+            <div class="photos-cover"></div>
+
+            <div class="photos-main">
+                <div class="photos-avatar">@avatarLetter</div>
+
+                <div class="photos-head-content">
+                    <div class="photos-name-row">
+                        <div>
+                            <h1 class="photos-title">Мои фото</h1>
+                            <div class="photos-subtitle">Загруженные изображения пользователя @Model.CurrentUserLogin</div>
+                        </div>
+
+                        <div class="photos-actions">
+                            <a asp-page="/Profile" class="btn btn-outline">Профиль</a>
+                            <a asp-page="/Messages" class="btn btn-outline">Сообщения</a>
+                            <a asp-page="/EditProfile" class="btn btn-light">Редактировать</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="photos-layout">
+            <aside class="photos-sidebar">
+                <div class="panel-card">
+                    <h2 class="card-title">Загрузка фото</h2>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+                    {
+                        <div class="alert success">@Model.SuccessMessage</div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+                    {
+                        <div class="alert error">@Model.ErrorMessage</div>
+                    }
+
+                    <form method="post" asp-page-handler="Upload" enctype="multipart/form-data">
+                        <div class="field">
+                            <label for="UploadFile">Выберите изображение</label>
+                            <input asp-for="UploadFile" type="file" accept=".jpg,.jpeg,.png,.webp,.gif,image/*" />
+                        </div>
+
+                        <button class="btn btn-light btn-full" type="submit">Загрузить фото</button>
+                    </form>
+
+                    <div class="upload-hint">
+                        Поддерживаются JPG, PNG, WEBP, GIF до 5 МБ.
+                    </div>
+                </div>
+
+                <div class="panel-card">
+                    <h2 class="card-title">Навигация</h2>
+                    <div class="nav-links">
+                        <a asp-page="/Profile" class="nav-link-box">Профиль</a>
+                        <a asp-page="/Messages" class="nav-link-box">Сообщения</a>
+                        <a asp-page="/EditProfile" class="nav-link-box">Редактирование</a>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="photos-content">
+                <div class="panel-card">
+                    <div class="gallery-header">
+                        <h2 class="card-title">Галерея</h2>
+                        <div class="gallery-count">Всего: @Model.Photos.Count</div>
+                    </div>
+
+                    @if (Model.Photos.Count == 0)
+                    {
+                        <div class="empty-state">
+                            У тебя пока нет загруженных фото.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="photos-grid">
+                            @foreach (var photo in Model.Photos)
+                            {
+                                <article class="photo-card">
+                                    <div class="photo-thumb-wrap">
+                                        <img src="@photo.RelativeUrl" alt="@photo.OriginalFileName" class="photo-thumb" />
+                                    </div>
+
+                                    <div class="photo-info">
+                                        <div class="photo-name" title="@photo.OriginalFileName">@photo.OriginalFileName</div>
+                                        <div class="photo-meta">@photo.UploadedAtText · @photo.SizeText</div>
+                                    </div>
+
+                                    <form method="post" asp-page-handler="Delete" class="photo-actions">
+                                        <input type="hidden" name="id" value="@photo.Id" />
+                                        <button type="submit" class="btn btn-danger btn-full">Удалить</button>
+                                    </form>
+                                </article>
+                            }
+                        </div>
+                    }
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/photos.css" asp-append-version="true" />
+}
