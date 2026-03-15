@@ -1,0 +1,149 @@
+﻿@page
+@model NewVK.Pages.EditProfileModel
+@{
+    ViewData["Title"] = "Редактирование профиля";
+
+    var currentTheme = Model.Themes.FirstOrDefault(x => x.Key == Model.Input.ThemeKey)
+                       ?? Model.Themes.FirstOrDefault();
+
+    var previewName = currentTheme?.Name ?? "Тема";
+}
+
+<div class="edit-page">
+    <div class="edit-shell">
+
+        <section class="edit-hero">
+            <div class="edit-cover"></div>
+
+            <div class="edit-main">
+                <div class="edit-avatar">
+                    @((!string.IsNullOrWhiteSpace(Model.Input.FirstName) ? Model.Input.FirstName[0].ToString().ToUpper() : "U"))
+                </div>
+
+                <div class="edit-head-content">
+                    <div class="edit-name-row">
+                        <div>
+                            <h1 class="edit-title">Редактирование профиля</h1>
+                            <div class="edit-subtitle">Изменение данных пользователя и темы сайта</div>
+                        </div>
+
+                        <div class="edit-actions">
+                            <a asp-page="/Profile" class="btn btn-outline">Назад в профиль</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="edit-content">
+            <aside class="edit-sidebar">
+                <div class="edit-card">
+                    <h2 class="card-title">Предпросмотр темы</h2>
+
+                    <div class="theme-preview">
+                        <div class="theme-preview-name" id="theme-preview-name">@previewName</div>
+
+                        <div class="theme-swatches">
+                            <span class="swatch swatch-primary" title="Primary"></span>
+                            <span class="swatch swatch-sand" title="Sand"></span>
+                            <span class="swatch swatch-sage" title="Sage"></span>
+                            <span class="swatch swatch-bg" title="Background"></span>
+                            <span class="swatch swatch-text" title="Text"></span>
+                        </div>
+
+                        <p class="theme-preview-text">
+                            После выбора темы цвета сайта изменятся сразу, а после сохранения
+                            выбор запишется в базу данных.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="edit-card">
+                    <h2 class="card-title">Подсказка</h2>
+                    <p class="hint-text">
+                        Здесь можно менять логин, основные данные, блок “О себе”
+                        и цветовую схему всего сайта.
+                    </p>
+                </div>
+            </aside>
+
+            <section class="edit-form-area">
+                <div class="edit-card">
+                    <h2 class="card-title">Данные профиля</h2>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+                    {
+                        <div class="alert success">@Model.SuccessMessage</div>
+                    }
+
+                    <div asp-validation-summary="ModelOnly" class="alert error"></div>
+
+                    <form method="post" asp-page-handler="Save" novalidate>
+                        <div class="form-grid">
+                            <div class="field">
+                                <label asp-for="Input.Login"></label>
+                                <input asp-for="Input.Login" />
+                                <span asp-validation-for="Input.Login" class="val"></span>
+                            </div>
+
+                            <div class="field">
+                                <label asp-for="Input.Email"></label>
+                                <input asp-for="Input.Email" />
+                                <span asp-validation-for="Input.Email" class="val"></span>
+                            </div>
+
+                            <div class="field">
+                                <label asp-for="Input.FirstName"></label>
+                                <input asp-for="Input.FirstName" />
+                                <span asp-validation-for="Input.FirstName" class="val"></span>
+                            </div>
+
+                            <div class="field">
+                                <label asp-for="Input.LastName"></label>
+                                <input asp-for="Input.LastName" />
+                                <span asp-validation-for="Input.LastName" class="val"></span>
+                            </div>
+
+                            <div class="field field-full">
+                                <label asp-for="Input.Phone"></label>
+                                <input asp-for="Input.Phone" />
+                                <span asp-validation-for="Input.Phone" class="val"></span>
+                            </div>
+
+                            <div class="field field-full">
+                                <label asp-for="Input.AboutMe"></label>
+                                <textarea asp-for="Input.AboutMe" rows="6" placeholder="Кратко расскажите о себе"></textarea>
+                                <span asp-validation-for="Input.AboutMe" class="val"></span>
+                            </div>
+
+                            <div class="field field-full">
+                                <label asp-for="Input.ThemeKey"></label>
+                                <select asp-for="Input.ThemeKey" id="theme-select">
+                                    @foreach (var theme in Model.Themes)
+                                    {
+                                        <option value="@theme.Key">@theme.Name</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="Input.ThemeKey" class="val"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn btn-primary-solid" type="submit">Сохранить изменения</button>
+                            <a asp-page="/Profile" class="btn btn-outline">Отмена</a>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/edit-profile.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/edit-profile.js" asp-append-version="true"></script>
+}

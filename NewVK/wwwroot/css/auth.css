@@ -1,6 +1,4 @@
-﻿/* Палитра: 6B5240-C9BCA4-B5C1B1-ECF2F1-383E44 */
-
-:root {
+﻿:root {
     --c-primary: #6B5240;
     --c-sand: #C9BCA4;
     --c-sage: #B5C1B1;
@@ -8,10 +6,9 @@
     --c-text: #383E44;
     --radius: 18px;
     --radius-sm: 12px;
-    --shadow: 0 10px 30px rgba(56,62,68,.12);
+    --shadow: 0 10px 30px color-mix(in srgb, var(--c-text) 12%, transparent);
 }
 
-/* ВАЖНО: align-items:flex-start — карточка больше не “прыгает” при изменении высоты */
 .auth-wrap {
     min-height: calc(100vh - 120px);
     display: flex;
@@ -22,8 +19,8 @@
 
 .auth-card {
     width: min(560px, 100%);
-    background: rgba(236,242,241,.85);
-    border: 1px solid rgba(201,188,164,.65);
+    background: color-mix(in srgb, var(--c-bg) 88%, transparent);
+    border: 1px solid color-mix(in srgb, var(--c-sand) 65%, transparent);
     border-radius: var(--radius);
     padding: 22px;
     box-shadow: var(--shadow);
@@ -42,8 +39,8 @@
     margin-bottom: 14px;
     padding: 6px;
     border-radius: var(--radius);
-    background: rgba(201,188,164,.28);
-    border: 1px solid rgba(201,188,164,.5);
+    background: color-mix(in srgb, var(--c-sand) 28%, transparent);
+    border: 1px solid color-mix(in srgb, var(--c-sand) 50%, transparent);
 }
 
 .tab {
@@ -59,7 +56,7 @@
 }
 
     .tab:hover {
-        background: rgba(181,193,177,.28);
+        background: color-mix(in srgb, var(--c-sage) 28%, transparent);
     }
 
     .tab:active {
@@ -89,15 +86,15 @@ input[type="tel"] {
     width: 100%;
     padding: 11px 12px;
     border-radius: var(--radius-sm);
-    border: 1px solid rgba(201,188,164,.75);
-    background: rgba(236,242,241,.95);
+    border: 1px solid color-mix(in srgb, var(--c-sand) 75%, transparent);
+    background: color-mix(in srgb, var(--c-bg) 95%, white);
     color: var(--c-text);
     outline: none;
 }
 
 input:focus {
-    border-color: rgba(181,193,177,.95);
-    box-shadow: 0 0 0 4px rgba(181,193,177,.28);
+    border-color: color-mix(in srgb, var(--c-sage) 95%, transparent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-sage) 28%, transparent);
     background: #fff;
 }
 
@@ -123,7 +120,7 @@ input:focus {
     align-items: center;
     gap: 8px;
     font-weight: 700;
-    color: rgba(56,62,68,.95);
+    color: color-mix(in srgb, var(--c-text) 95%, transparent);
 }
 
     .check input {
@@ -134,7 +131,7 @@ input:focus {
     width: 100%;
     margin-top: 10px;
     padding: 12px 14px;
-    border: 1px solid rgba(56,62,68,.15);
+    border: 1px solid color-mix(in srgb, var(--c-text) 15%, transparent);
     border-radius: 14px;
     background: var(--c-primary);
     color: #fff;
@@ -144,6 +141,10 @@ input:focus {
 
     .btn:active {
         transform: translateY(1px);
+    }
+
+    .btn:hover {
+        background: color-mix(in srgb, var(--c-primary) 82%, black);
     }
 
 .val {
@@ -157,20 +158,19 @@ input:focus {
     margin: 10px 0;
     padding: 10px 12px;
     border-radius: var(--radius-sm);
-    border: 1px solid rgba(201,188,164,.6);
+    border: 1px solid color-mix(in srgb, var(--c-sand) 60%, transparent);
 }
 
     .alert.error {
-        background: rgba(201,188,164,.25);
+        background: color-mix(in srgb, var(--c-sand) 25%, transparent);
         color: var(--c-text);
     }
 
     .alert.success {
-        background: rgba(181,193,177,.35);
+        background: color-mix(in srgb, var(--c-sage) 35%, transparent);
         color: var(--c-text);
     }
 
-/* Регистрация раскрывается вниз, без смены верхних полей */
 .reg-extra {
     overflow: hidden;
     max-height: 0;
@@ -180,12 +180,12 @@ input:focus {
 }
 
     .reg-extra.open {
-        max-height: 2000px; /* просто запас */
+        max-height: 2000px;
         opacity: 1;
         margin-top: 12px;
     }
 
-@media (max-width:520px) {
+@media (max-width: 520px) {
     .grid {
         grid-template-columns: 1fr;
     }

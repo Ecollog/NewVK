@@ -1,0 +1,56 @@
+﻿[
+  {
+    "key": "earthy",
+    "name": "Землистая",
+    "primary": "#6B5240",
+    "sand": "#C9BCA4",
+    "sage": "#B5C1B1",
+    "bg": "#ECF2F1",
+    "text": "#383E44"
+  },
+  {
+    "key": "ocean",
+    "name": "Океан",
+    "primary": "#24577A",
+    "sand": "#BFD6E2",
+    "sage": "#8FB6C9",
+    "bg": "#EEF6FA",
+    "text": "#20313D"
+  },
+  {
+    "key": "forest",
+    "name": "Лес",
+    "primary": "#355E3B",
+    "sand": "#D7D2C2",
+    "sage": "#9DB69B",
+    "bg": "#F3F7F1",
+    "text": "#2B342C"
+  },
+  {
+    "key": "ember",
+    "name": "Уголь и медь",
+    "primary": "#7A3E2E",
+    "sand": "#D8C1B3",
+    "sage": "#C9A58C",
+    "bg": "#FBF3EF",
+    "text": "#3D2D29"
+  },
+  {
+    "key": "violet",
+    "name": "Фиалка",
+    "primary": "#5C4B8A",
+    "sand": "#D7CFEA",
+    "sage": "#B5ACD6",
+    "bg": "#F5F2FB",
+    "text": "#322E44"
+  },
+  {
+    "key": "graphite",
+    "name": "Графит",
+    "primary": "#43474F",
+    "sand": "#C6CBD3",
+    "sage": "#9CA6B4",
+    "bg": "#F3F5F7",
+    "text": "#23272D"
+  }
+]

@@ -1,14 +1,12 @@
 using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
 using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NewVK.Data;
 using NewVK.Models;
 using NewVK.Security;
+using NewVK.Services;
 
 namespace NewVK.Pages
 {
@@ -17,11 +15,16 @@ namespace NewVK.Pages
     {
         private readonly UsersRepository _usersRepository;
         private readonly PasswordHasher _passwordHasher;
+        private readonly AuthCookieService _authCookieService;
 
-        public IndexModel(UsersRepository usersRepository, PasswordHasher passwordHasher)
+        public IndexModel(
+            UsersRepository usersRepository,
+            PasswordHasher passwordHasher,
+            AuthCookieService authCookieService)
         {
             _usersRepository = usersRepository;
             _passwordHasher = passwordHasher;
+            _authCookieService = authCookieService;
         }
 
         public string SuccessMessage { get; set; } = "";
@@ -84,6 +87,7 @@ namespace NewVK.Pages
                 Email = Auth.Email.Trim(),
                 Phone = Auth.Phone.Trim(),
                 AboutMe = null,
+                ThemeKey = SiteThemeDefaults.DefaultKey,
                 PasswordHash = hashResult.Hash,
                 PasswordSalt = hashResult.Salt
             };
@@ -98,7 +102,7 @@ namespace NewVK.Pages
                 return Page();
             }
 
-            await SignInAsync(user, isPersistent: true);
+            await _authCookieService.SignInAsync(HttpContext, user, isPersistent: true);
             return RedirectToPage("/Profile");
         }
 
@@ -121,44 +125,9 @@ namespace NewVK.Pages
             }
 
             await _usersRepository.UpdateLastLoginAsync(user.Id, cancellationToken);
-            await SignInAsync(user, Auth.RememberMe);
+            await _authCookieService.SignInAsync(HttpContext, user, Auth.RememberMe);
 
             return RedirectToPage("/Profile");
-        }
-
-        private async Task SignInAsync(AppUser user, bool isPersistent)
-        {
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Login),
-                new Claim(ClaimTypes.GivenName, user.FirstName),
-                new Claim(ClaimTypes.Surname, user.LastName),
-                new Claim(ClaimTypes.Email, user.Email)
-            };
-
-            if (!string.IsNullOrWhiteSpace(user.Phone))
-                claims.Add(new Claim(ClaimTypes.MobilePhone, user.Phone));
-
-            var identity = new ClaimsIdentity(
-                claims,
-                CookieAuthenticationDefaults.AuthenticationScheme);
-
-            var principal = new ClaimsPrincipal(identity);
-
-            var properties = new AuthenticationProperties
-            {
-                IsPersistent = isPersistent,
-                AllowRefresh = true,
-                ExpiresUtc = isPersistent
-                    ? DateTimeOffset.UtcNow.AddDays(30)
-                    : null
-            };
-
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                principal,
-                properties);
         }
 
         private void ValidateForm()

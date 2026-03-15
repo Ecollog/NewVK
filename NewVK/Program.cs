@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity;
 using NewVK.Data;
 using NewVK.Security;
 using NewVK.Services;
@@ -36,7 +35,9 @@ namespace NewVK
             builder.Services.AddScoped<AppDbConnectionFactory>();
             builder.Services.AddScoped<UsersRepository>();
             builder.Services.AddScoped<CurrentUserService>();
+            builder.Services.AddScoped<AuthCookieService>();
             builder.Services.AddSingleton<PasswordHasher>();
+            builder.Services.AddSingleton<ThemeCatalogService>();
 
             var app = builder.Build();
 

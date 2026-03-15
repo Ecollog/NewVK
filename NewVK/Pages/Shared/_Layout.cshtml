@@ -1,20 +1,41 @@
-﻿<!DOCTYPE html>
+﻿@using NewVK.Models
+@using NewVK.Services
+@inject ThemeCatalogService ThemeCatalogService
+
+@{
+    var themeKey = User.FindFirst(AuthCookieService.ThemeClaimType)?.Value ?? SiteThemeDefaults.DefaultKey;
+    var theme = ThemeCatalogService.GetByKeyOrDefault(themeKey);
+}
+
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - NewVK</title>
 
+    <style id="server-theme-vars">
+        :root {
+            --c-primary: @theme.Primary;
+            --c-sand: @theme.Sand;
+            --c-sage: @theme.Sage;
+            --c-bg: @theme.Bg;
+            --c-text: @theme.Text;
+            --radius: 18px;
+            --radius-sm: 12px;
+            --shadow: 0 10px 30px color-mix(in srgb, var(--c-text) 12%, transparent);
+            --shadow-soft: 0 6px 18px color-mix(in srgb, var(--c-text) 10%, transparent);
+        }
+    </style>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/NewVK.styles.css" asp-append-version="true" />
 
-    @* Подключение дополнительных CSS со страниц *@
     @await RenderSectionAsync("Styles", required: false)
 </head>
-<body>
+<body data-user-theme="@theme.Key">
     <header>
-        @* тут можешь добавить навбар *@
     </header>
 
     <div class="container">
@@ -24,14 +45,13 @@
     </div>
 
     <footer>
-        @* тут можешь добавить футер *@
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/theme-loader.js" asp-append-version="true"></script>
 
-    @* Подключение дополнительных JS со страниц *@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

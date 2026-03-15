@@ -6,34 +6,40 @@
     --c-text: #383E44;
     --radius: 18px;
     --radius-sm: 12px;
-    --shadow: 0 10px 30px rgba(56,62,68,.12);
-    --shadow-soft: 0 6px 18px rgba(56,62,68,.10);
+    --shadow: 0 10px 30px color-mix(in srgb, var(--c-text) 12%, transparent);
+    --shadow-soft: 0 6px 18px color-mix(in srgb, var(--c-text) 10%, transparent);
 }
 
-html, body {
+html,
+body {
     height: 100%;
 }
 
 body {
-    background: var(--c-bg);
+    background: radial-gradient(circle at top left, color-mix(in srgb, var(--c-sand) 28%, transparent), transparent 28%), radial-gradient(circle at top right, color-mix(in srgb, var(--c-sage) 24%, transparent), transparent 24%), linear-gradient(180deg, color-mix(in srgb, var(--c-bg) 82%, white) 0%, var(--c-bg) 100%);
     color: var(--c-text);
 }
 
-/* Небольшая “подстройка” bootstrap под палитру (не ломает bootstrap, только оттенки) */
 a {
     color: var(--c-primary);
 }
 
     a:hover {
-        color: #5a4435;
+        color: color-mix(in srgb, var(--c-primary) 82%, black);
     }
 
 ::selection {
-    background: rgba(107,82,64,.22);
+    background: color-mix(in srgb, var(--c-primary) 22%, transparent);
 }
 
-/* Красивый фокус для инпутов */
 :focus-visible {
-    outline: 3px solid rgba(181,193,177,.55);
+    outline: 3px solid color-mix(in srgb, var(--c-sage) 55%, transparent);
     outline-offset: 2px;
+}
+
+input,
+select,
+textarea,
+button {
+    transition: background .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease, transform .08s ease;
 }

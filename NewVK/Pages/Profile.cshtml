@@ -18,6 +18,10 @@
             ? Model.Login.Substring(0, 1).ToUpper()
             : "U";
     }
+
+    var aboutText = string.IsNullOrWhiteSpace(Model.AboutMe)
+        ? "Здесь пока нет описания. Его можно добавить на странице редактирования профиля."
+        : Model.AboutMe;
 }
 
 <div class="profile-page">
@@ -37,14 +41,13 @@
                         </div>
 
                         <div class="profile-actions">
-                            <a href="#" class="btn btn-light">Редактировать</a>
+                            <a asp-page="/EditProfile" class="btn btn-light">Редактировать</a>
                             <a href="#" class="btn btn-outline">Сообщение</a>
                         </div>
                     </div>
 
                     <p class="profile-status">
-                        Добро пожаловать в профиль. Здесь может быть краткое описание пользователя,
-                        его интересов, статус или любая публичная информация.
+                        @aboutText
                     </p>
 
                     <div class="profile-stats">
@@ -99,15 +102,18 @@
                             <span class="info-label">Телефон</span>
                             <span class="info-value">@Model.Phone</span>
                         </div>
+
+                        <div class="info-row">
+                            <span class="info-label">Тема</span>
+                            <span class="info-value">@Model.ThemeKey</span>
+                        </div>
                     </div>
                 </div>
 
                 <div class="info-card">
                     <h2 class="card-title">О себе</h2>
                     <p class="about-text">
-                        Здесь можно вывести биографию, интересы, любимую музыку, игры, фильмы,
-                        место учебы или работы. Пока это декоративный блок, но его легко
-                        подключить к базе данных.
+                        @aboutText
                     </p>
                 </div>
 
