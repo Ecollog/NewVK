@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,107 +11,220 @@ namespace NewVK.Pages
     [Authorize]
     public class MessagesModel : PageModel
     {
+        private static readonly CultureInfo RussianCulture = new("ru-RU");
+
         private readonly CurrentUserService _currentUserService;
         private readonly UsersRepository _usersRepository;
+        private readonly MessagesRepository _messagesRepository;
 
         public MessagesModel(
             CurrentUserService currentUserService,
-            UsersRepository usersRepository)
+            UsersRepository usersRepository,
+            MessagesRepository messagesRepository)
         {
             _currentUserService = currentUserService;
             _usersRepository = usersRepository;
+            _messagesRepository = messagesRepository;
         }
 
         [BindProperty(SupportsGet = true)]
-        public string? Chat { get; set; }
+        public int? Chat { get; set; }
+
+        [BindProperty]
+        public SendMessageInput Input { get; set; } = new();
+
+        [TempData]
+        public string? SuccessMessage { get; set; }
+
+        [TempData]
+        public string? ErrorMessage { get; set; }
 
         public string CurrentUserName { get; private set; } = "";
         public string CurrentUserLogin { get; private set; } = "";
-        public string ActiveChatId { get; private set; } = "";
+        public int ActiveChatId { get; private set; }
 
         public IReadOnlyList<DialogVm> Dialogs { get; private set; } = Array.Empty<DialogVm>();
         public DialogVm? ActiveDialog { get; private set; }
 
         public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
         {
-            int? userId = _currentUserService.GetUserId();
-            if (userId is null)
-                return RedirectToPage("/Index");
-
-            AppUser? user = await _usersRepository.GetByIdAsync(userId.Value, cancellationToken);
+            AppUser? user = await GetCurrentUserAsync(cancellationToken);
             if (user is null)
                 return RedirectToPage("/Index");
 
+            await LoadPageAsync(user, cancellationToken);
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostSendAsync(CancellationToken cancellationToken)
+        {
+            AppUser? user = await GetCurrentUserAsync(cancellationToken);
+            if (user is null)
+                return RedirectToPage("/Index");
+
+            ValidateInput();
+
+            if (!ModelState.IsValid)
+            {
+                await LoadPageAsync(user, cancellationToken);
+                return Page();
+            }
+
+            SendDirectMessageResult result = await _messagesRepository.SendDirectMessageByLoginAsync(
+                user.Id,
+                Input.TargetLogin,
+                Input.Text,
+                cancellationToken);
+
+            if (result.Status == SendDirectMessageStatus.RecipientNotFound)
+            {
+                ModelState.AddModelError("Input.TargetLogin", "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃ С‚Р°РєРёРј Р»РѕРіРёРЅРѕРј РЅРµ РЅР°Р№РґРµРЅ.");
+                await LoadPageAsync(user, cancellationToken);
+                return Page();
+            }
+
+            if (result.Status == SendDirectMessageStatus.CannotMessageSelf)
+            {
+                ModelState.AddModelError("Input.TargetLogin", "РќРµР»СЊР·СЏ РѕС‚РїСЂР°РІРёС‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ СЃР°РјРѕРјСѓ СЃРµР±Рµ.");
+                await LoadPageAsync(user, cancellationToken);
+                return Page();
+            }
+
+            SuccessMessage = "РЎРѕРѕР±С‰РµРЅРёРµ РѕС‚РїСЂР°РІР»РµРЅРѕ.";
+            return RedirectToPage("/Messages", new { chat = result.ConversationId });
+        }
+
+        private async Task<AppUser?> GetCurrentUserAsync(CancellationToken cancellationToken)
+        {
+            int? userId = _currentUserService.GetUserId();
+            if (userId is null)
+                return null;
+
+            return await _usersRepository.GetByIdAsync(userId.Value, cancellationToken);
+        }
+
+        private async Task LoadPageAsync(AppUser user, CancellationToken cancellationToken)
+        {
             CurrentUserName = $"{user.FirstName} {user.LastName}".Trim();
             if (string.IsNullOrWhiteSpace(CurrentUserName))
                 CurrentUserName = user.Login;
 
             CurrentUserLogin = user.Login;
 
-            Dialogs = BuildDemoDialogs(CurrentUserName);
+            if (Chat.HasValue)
+                await _messagesRepository.MarkAsReadAsync(Chat.Value, user.Id, cancellationToken);
 
-            ActiveDialog = Dialogs.FirstOrDefault(x => x.Id == Chat) ?? Dialogs.FirstOrDefault();
-            ActiveChatId = ActiveDialog?.Id ?? "";
+            List<DialogVm> dialogs = (await _messagesRepository.GetDialogsAsync(user.Id, cancellationToken))
+                .Select(MapDialog)
+                .ToList();
 
-            return Page();
+            Dialogs = dialogs;
+
+            ActiveDialog = dialogs.FirstOrDefault(x => x.Id == Chat) ?? dialogs.FirstOrDefault();
+            ActiveChatId = ActiveDialog?.Id ?? 0;
+
+            if (ActiveDialog is not null)
+            {
+                ActiveDialog.Messages = (await _messagesRepository.GetMessagesAsync(ActiveDialog.Id, user.Id, cancellationToken))
+                    .Select(message => new MessageVm
+                    {
+                        IsMine = message.SenderUserId == user.Id,
+                        Text = message.Body,
+                        Time = FormatMessageTime(message.SentAtUtc)
+                    })
+                    .ToList();
+
+                if (string.IsNullOrWhiteSpace(Input.TargetLogin))
+                    Input.TargetLogin = ActiveDialog.UserLogin;
+            }
         }
 
-        private static IReadOnlyList<DialogVm> BuildDemoDialogs(string currentUserName)
+        private void ValidateInput()
         {
-            return new List<DialogVm>
+            Input.TargetLogin = (Input.TargetLogin ?? string.Empty).Trim();
+            Input.Text = (Input.Text ?? string.Empty).Trim();
+
+            if (string.IsNullOrWhiteSpace(Input.TargetLogin))
+                ModelState.AddModelError("Input.TargetLogin", "Р’РІРµРґРёС‚Рµ Р»РѕРіРёРЅ РїРѕР»СѓС‡Р°С‚РµР»СЏ.");
+            else if (Input.TargetLogin.Length > 50)
+                ModelState.AddModelError("Input.TargetLogin", "Р›РѕРіРёРЅ СЃР»РёС€РєРѕРј РґР»РёРЅРЅС‹Р№.");
+
+            if (string.IsNullOrWhiteSpace(Input.Text))
+                ModelState.AddModelError("Input.Text", "Р’РІРµРґРёС‚Рµ С‚РµРєСЃС‚ СЃРѕРѕР±С‰РµРЅРёСЏ.");
+            else if (Input.Text.Length > 4000)
+                ModelState.AddModelError("Input.Text", "РЎРѕРѕР±С‰РµРЅРёРµ РЅРµ РґРѕР»Р¶РЅРѕ РїСЂРµРІС‹С€Р°С‚СЊ 4000 СЃРёРјРІРѕР»РѕРІ.");
+        }
+
+        private static DialogVm MapDialog(MessageDialogListItem dialog)
+        {
+            return new DialogVm
             {
-                new()
-                {
-                    Id = "anna",
-                    UserName = "Анна Власова",
-                    UserHandle = "@anna.v",
-                    Preview = "Я посмотрела фото, получилось очень хорошо.",
-                    LastTime = "12:48",
-                    UnreadCount = 2,
-                    Messages =
-                    {
-                        new MessageVm { IsMine = false, Text = "Привет! Ты уже загрузил новые фото?", Time = "12:31" },
-                        new MessageVm { IsMine = true,  Text = "Да, сегодня добавил несколько штук.", Time = "12:36" },
-                        new MessageVm { IsMine = false, Text = "Я посмотрела фото, получилось очень хорошо.", Time = "12:48" }
-                    }
-                },
-                new()
-                {
-                    Id = "max",
-                    UserName = "Максим Орлов",
-                    UserHandle = "@max.orlov",
-                    Preview = "Завтра напишу по странице сообщений.",
-                    LastTime = "вчера",
-                    UnreadCount = 0,
-                    Messages =
-                    {
-                        new MessageVm { IsMine = false, Text = "Я набросал идеи для диалогов и списка друзей.", Time = "18:10" },
-                        new MessageVm { IsMine = true,  Text = "Отлично, потом подключим это к БД.", Time = "18:16" },
-                        new MessageVm { IsMine = false, Text = "Завтра напишу по странице сообщений.", Time = "18:18" }
-                    }
-                },
-                new()
-                {
-                    Id = "irina",
-                    UserName = "Ирина Белова",
-                    UserHandle = "@irina.b",
-                    Preview = "Не забудь добавить кнопку перехода в профиль.",
-                    LastTime = "пт",
-                    UnreadCount = 1,
-                    Messages =
-                    {
-                        new MessageVm { IsMine = false, Text = "Страница фото уже выглядит хорошо.", Time = "17:01" },
-                        new MessageVm { IsMine = true,  Text = "Осталось только добавить переходы между разделами.", Time = "17:03" },
-                        new MessageVm { IsMine = false, Text = "Не забудь добавить кнопку перехода в профиль.", Time = "17:05" }
-                    }
-                }
+                Id = dialog.ConversationId,
+                UserName = dialog.OtherUserName,
+                UserLogin = dialog.OtherUserLogin,
+                UserHandle = "@"+dialog.OtherUserLogin,
+                Preview = BuildPreview(dialog.Preview),
+                LastTime = FormatDialogTime(dialog.LastMessageAtUtc),
+                UnreadCount = dialog.UnreadCount
             };
+        }
+
+        private static string BuildPreview(string value)
+        {
+            string compact = (value ?? string.Empty).Replace("\r", " ").Replace("\n", " ").Trim();
+            if (compact.Length <= 90)
+                return compact;
+
+            return compact[..87].TrimEnd() + "...";
+        }
+
+        private static string FormatDialogTime(DateTime utc)
+        {
+            DateTime local = ToLocalTime(utc);
+            DateTime today = ToLocalTime(DateTime.UtcNow).Date;
+
+            if (local.Date == today)
+                return local.ToString("HH:mm", RussianCulture);
+
+            if (local.Date == today.AddDays(-1))
+                return "РІС‡РµСЂР°";
+
+            if (local.Date >= today.AddDays(-6))
+                return RussianCulture.DateTimeFormat.GetAbbreviatedDayName(local.DayOfWeek).TrimEnd('.');
+
+            return local.ToString("dd.MM", RussianCulture);
+        }
+
+        private static string FormatMessageTime(DateTime utc)
+        {
+            DateTime local = ToLocalTime(utc);
+            DateTime today = ToLocalTime(DateTime.UtcNow).Date;
+
+            return local.Date == today
+                ? local.ToString("HH:mm", RussianCulture)
+                : local.ToString("dd.MM HH:mm", RussianCulture);
+        }
+
+        private static DateTime ToLocalTime(DateTime utc)
+        {
+            DateTime utcValue = utc.Kind == DateTimeKind.Utc
+                ? utc
+                : DateTime.SpecifyKind(utc, DateTimeKind.Utc);
+
+            return TimeZoneInfo.ConvertTimeFromUtc(utcValue, TimeZoneInfo.Local);
+        }
+
+        public sealed class SendMessageInput
+        {
+            public string TargetLogin { get; set; } = "";
+            public string Text { get; set; } = "";
         }
 
         public sealed class DialogVm
         {
-            public string Id { get; set; } = "";
+            public int Id { get; set; }
             public string UserName { get; set; } = "";
+            public string UserLogin { get; set; } = "";
             public string UserHandle { get; set; } = "";
             public string Preview { get; set; } = "";
             public string LastTime { get; set; } = "";

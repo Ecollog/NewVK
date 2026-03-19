@@ -34,6 +34,7 @@ namespace NewVK
 
             builder.Services.AddScoped<AppDbConnectionFactory>();
             builder.Services.AddScoped<UsersRepository>();
+            builder.Services.AddScoped<MessagesRepository>();
             builder.Services.AddScoped<UserPhotosRepository>();
             builder.Services.AddScoped<CurrentUserService>();
             builder.Services.AddScoped<AuthCookieService>();
