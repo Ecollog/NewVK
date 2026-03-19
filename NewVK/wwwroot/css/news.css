@@ -1,0 +1,193 @@
+.news-page {
+    gap: 24px;
+}
+
+.news-hero {
+    position: relative;
+    overflow: hidden;
+}
+
+.news-hero::after {
+    content: "";
+    position: absolute;
+    inset: auto -80px -90px auto;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--c-primary) 26%, transparent) 0%, transparent 68%);
+    pointer-events: none;
+}
+
+.news-brief-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.brief-card {
+    position: relative;
+    overflow: hidden;
+    min-height: 180px;
+    background:
+        linear-gradient(180deg, color-mix(in srgb, white 66%, transparent), transparent),
+        linear-gradient(135deg, color-mix(in srgb, var(--c-sand) 18%, transparent), color-mix(in srgb, var(--c-sage) 18%, transparent));
+}
+
+.brief-card::before {
+    content: "";
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 32px;
+    background: color-mix(in srgb, var(--c-primary) 14%, transparent);
+    transform: rotate(18deg);
+}
+
+.brief-label,
+.story-category,
+.sidebar-kicker {
+    font-size: .8rem;
+    font-weight: 900;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--c-primary) 82%, transparent);
+}
+
+.brief-value {
+    margin-top: 16px;
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    line-height: 1;
+    font-weight: 900;
+    color: var(--c-text);
+}
+
+.brief-note {
+    margin: 14px 0 0;
+    max-width: 28ch;
+    color: color-mix(in srgb, var(--c-text) 82%, transparent);
+}
+
+.news-content-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(280px, .9fr);
+    gap: 18px;
+    align-items: start;
+}
+
+.news-feed,
+.news-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.news-story {
+    position: relative;
+    overflow: hidden;
+    padding: 24px;
+}
+
+.news-story::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--c-primary) 65%, transparent);
+}
+
+.accent-sage::before {
+    background: color-mix(in srgb, var(--c-sage) 90%, var(--c-primary));
+}
+
+.accent-sand::before {
+    background: color-mix(in srgb, var(--c-sand) 92%, var(--c-primary));
+}
+
+.accent-primary::before {
+    background: var(--c-primary);
+}
+
+.story-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+}
+
+.story-time {
+    color: color-mix(in srgb, var(--c-text) 65%, transparent);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.story-title {
+    margin: 14px 0 10px;
+    font-size: clamp(1.35rem, 2.4vw, 1.8rem);
+    line-height: 1.15;
+    font-weight: 900;
+}
+
+.story-summary {
+    margin: 0;
+    color: color-mix(in srgb, var(--c-text) 85%, transparent);
+    max-width: 62ch;
+}
+
+.sidebar-highlight {
+    background:
+        radial-gradient(circle at top right, color-mix(in srgb, var(--c-sage) 30%, transparent), transparent 34%),
+        linear-gradient(180deg, color-mix(in srgb, white 62%, transparent), color-mix(in srgb, var(--c-bg) 92%, transparent));
+}
+
+.sidebar-list-card {
+    background: color-mix(in srgb, var(--c-sand) 10%, white);
+}
+
+.news-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.news-check-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    color: color-mix(in srgb, var(--c-text) 88%, transparent);
+    font-weight: 700;
+}
+
+.news-check-dot {
+    width: 12px;
+    height: 12px;
+    margin-top: 5px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--c-primary), color-mix(in srgb, var(--c-sage) 70%, white));
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--c-primary) 12%, transparent);
+}
+
+@media (max-width: 980px) {
+    .news-brief-grid,
+    .news-content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 720px) {
+    .brief-card,
+    .news-story {
+        padding: 20px;
+    }
+
+    .story-meta {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .story-time {
+        white-space: normal;
+    }
+}

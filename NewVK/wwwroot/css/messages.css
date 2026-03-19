@@ -1,128 +1,65 @@
-﻿:root {
-    --c-primary: #6B5240;
-    --c-sand: #C9BCA4;
-    --c-sage: #B5C1B1;
-    --c-bg: #ECF2F1;
-    --c-text: #383E44;
-    --radius: 18px;
-    --radius-sm: 12px;
-    --shadow: 0 10px 30px rgba(56,62,68,.12);
-}
-
-* {
-    box-sizing: border-box;
-}
-
-.messages-page {
-    min-height: calc(100vh - 120px);
-    padding: 36px 24px 28px;
-}
-
-.messages-shell {
-    max-width: 1280px;
-    margin: 0 auto;
-}
-
-.messages-hero,
-.panel-card {
-    background: rgba(236,242,241,.88);
-    border: 1px solid rgba(201,188,164,.65);
-    border-radius: 24px;
-    box-shadow: var(--shadow);
-    backdrop-filter: blur(10px);
-}
-
-.messages-hero {
-    overflow: hidden;
-}
-
-.messages-cover {
-    height: 190px;
-    background: linear-gradient(135deg, rgba(107,82,64,.95), rgba(201,188,164,.95)), linear-gradient(45deg, rgba(255,255,255,.16), rgba(255,255,255,.03));
-    position: relative;
-}
-
-    .messages-cover::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(circle at 18% 30%, rgba(255,255,255,.18), transparent 16%), radial-gradient(circle at 78% 24%, rgba(255,255,255,.14), transparent 15%), radial-gradient(circle at 68% 75%, rgba(181,193,177,.18), transparent 18%);
-    }
-
-.messages-main {
+.header-user-badge {
     display: flex;
-    gap: 24px;
-    align-items: flex-end;
-    padding: 0 28px 28px;
-    margin-top: -54px;
-    position: relative;
-    z-index: 2;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 20px;
+    background: color-mix(in srgb, var(--c-sand) 18%, transparent);
+    border: 1px solid color-mix(in srgb, var(--c-sand) 58%, transparent);
 }
 
-.messages-avatar {
-    width: 112px;
-    height: 112px;
-    min-width: 112px;
-    border-radius: 24px;
+.header-user-avatar,
+.dialog-avatar,
+.chat-user-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 34px;
-    font-weight: 900;
+    background: linear-gradient(135deg, var(--c-primary), color-mix(in srgb, var(--c-primary) 72%, white));
     color: #fff;
-    background: linear-gradient(135deg, var(--c-primary), #8a6b53);
-    border: 5px solid var(--c-bg);
+    font-weight: 900;
 }
 
-.messages-head-content {
-    flex: 1;
-    min-width: 0;
-}
-
-.messages-name-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 18px;
-    align-items: flex-start;
-}
-
-.messages-title {
-    margin: 0;
-    font-size: 2rem;
-    line-height: 1.1;
+.header-user-name,
+.dialog-name,
+.chat-user-name {
     font-weight: 900;
     color: var(--c-text);
 }
 
-.messages-subtitle {
-    margin-top: 8px;
-    color: rgba(56,62,68,.75);
-    font-size: 1rem;
+.header-user-login,
+.dialog-time,
+.chat-user-handle,
+.message-time,
+.compose-note {
+    color: color-mix(in srgb, var(--c-text) 68%, transparent);
+    font-size: .92rem;
     font-weight: 700;
-}
-
-.messages-actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
 }
 
 .messages-layout {
     display: grid;
-    grid-template-columns: 360px 1fr;
+    grid-template-columns: 360px minmax(0, 1fr);
     gap: 22px;
-    margin-top: 22px;
 }
 
-.panel-card {
-    padding: 22px;
+.dialogs-panel,
+.chat-panel {
+    min-width: 0;
 }
 
-.card-title {
-    margin: 0 0 16px;
-    font-size: 1.06rem;
-    font-weight: 900;
-    color: var(--c-text);
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.panel-header .card-title {
+    margin-bottom: 0;
 }
 
 .dialogs-list {
@@ -140,31 +77,20 @@
     color: inherit;
     border-radius: 18px;
     padding: 12px;
-    border: 1px solid rgba(201,188,164,.55);
-    background: rgba(201,188,164,.12);
+    border: 1px solid color-mix(in srgb, var(--c-sand) 58%, transparent);
+    background: color-mix(in srgb, var(--c-sand) 12%, transparent);
     transition: background .15s ease, transform .08s ease, border-color .15s ease;
 }
 
-    .dialog-item:hover {
-        background: rgba(181,193,177,.20);
-    }
+.dialog-item:hover {
+    text-decoration: none;
+    color: inherit;
+    background: color-mix(in srgb, var(--c-sage) 20%, transparent);
+}
 
-    .dialog-item.active {
-        background: rgba(181,193,177,.26);
-        border-color: rgba(107,82,64,.35);
-    }
-
-.dialog-avatar,
-.chat-user-avatar {
-    width: 52px;
-    height: 52px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, var(--c-primary), #8a6b53);
-    color: #fff;
-    font-weight: 900;
+.dialog-item.active {
+    background: color-mix(in srgb, var(--c-sage) 26%, transparent);
+    border-color: color-mix(in srgb, var(--c-primary) 34%, transparent);
 }
 
 .dialog-top {
@@ -173,24 +99,9 @@
     gap: 10px;
 }
 
-.dialog-name,
-.chat-user-name {
-    font-weight: 900;
-    color: var(--c-text);
-}
-
-.dialog-time,
-.chat-user-handle,
-.message-time,
-.compose-note {
-    color: rgba(56,62,68,.68);
-    font-size: .92rem;
-    font-weight: 700;
-}
-
 .dialog-preview {
     margin-top: 6px;
-    color: rgba(56,62,68,.88);
+    color: color-mix(in srgb, var(--c-text) 88%, transparent);
     line-height: 1.45;
     font-size: .95rem;
 }
@@ -217,7 +128,7 @@
 
 .chat-header {
     padding-bottom: 16px;
-    border-bottom: 1px solid rgba(201,188,164,.55);
+    border-bottom: 1px solid color-mix(in srgb, var(--c-sand) 54%, transparent);
 }
 
 .chat-user {
@@ -238,25 +149,25 @@
     display: flex;
 }
 
-    .message-row.mine {
-        justify-content: flex-end;
-    }
+.message-row.mine {
+    justify-content: flex-end;
+}
 
-    .message-row.other {
-        justify-content: flex-start;
-    }
+.message-row.other {
+    justify-content: flex-start;
+}
 
 .message-bubble {
     max-width: min(78%, 520px);
     border-radius: 18px;
     padding: 14px 14px 10px;
-    border: 1px solid rgba(201,188,164,.55);
-    background: rgba(201,188,164,.12);
+    border: 1px solid color-mix(in srgb, var(--c-sand) 56%, transparent);
+    background: color-mix(in srgb, var(--c-sand) 12%, transparent);
 }
 
 .message-row.mine .message-bubble {
-    background: rgba(181,193,177,.24);
-    border-color: rgba(181,193,177,.65);
+    background: color-mix(in srgb, var(--c-sage) 24%, transparent);
+    border-color: color-mix(in srgb, var(--c-sage) 64%, transparent);
 }
 
 .message-text {
@@ -271,45 +182,8 @@
 
 .chat-compose {
     padding-top: 16px;
-    border-top: 1px solid rgba(201,188,164,.55);
+    border-top: 1px solid color-mix(in srgb, var(--c-sand) 54%, transparent);
 }
-
-.btn {
-    border-radius: 14px;
-    padding: 11px 16px;
-    font-size: .96rem;
-    font-weight: 800;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(56,62,68,.15);
-    transition: background .15s ease, color .15s ease, transform .08s ease, border-color .15s ease;
-}
-
-    .btn:active {
-        transform: translateY(1px);
-    }
-
-.btn-light {
-    background: var(--c-primary);
-    color: #fff;
-}
-
-    .btn-light:hover {
-        background: #5d4738;
-    }
-
-.btn-outline {
-    background: rgba(201,188,164,.18);
-    color: var(--c-text);
-    border: 1px solid rgba(201,188,164,.7);
-}
-
-    .btn-outline:hover {
-        background: rgba(181,193,177,.24);
-    }
 
 @media (max-width: 980px) {
     .messages-layout {
@@ -317,48 +191,9 @@
     }
 }
 
-@media (max-width: 760px) {
-    .messages-main {
-        flex-direction: column;
-        align-items: flex-start;
-        margin-top: -44px;
-    }
-
-    .messages-name-row {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-}
-
-@media (max-width: 560px) {
-    .messages-page {
-        padding: 18px 12px 24px;
-    }
-
-    .messages-cover {
-        height: 150px;
-    }
-
-    .messages-main {
-        padding: 0 16px 18px;
-        gap: 16px;
-    }
-
-    .messages-avatar {
-        width: 92px;
-        height: 92px;
-        min-width: 92px;
-        font-size: 28px;
-        border-radius: 20px;
-    }
-
-    .messages-title {
-        font-size: 1.55rem;
-    }
-
-    .panel-card {
-        border-radius: 18px;
-        padding: 18px;
+@media (max-width: 720px) {
+    .header-user-badge {
+        width: 100%;
     }
 
     .message-bubble {

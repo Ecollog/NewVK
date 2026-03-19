@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model NewVK.Pages.ProfileModel
 @{
     ViewData["Title"] = "Профиль";
@@ -9,184 +9,177 @@
         fullName = Model.Login;
     }
 
-    var firstInitial = !string.IsNullOrWhiteSpace(Model.FirstName) ? Model.FirstName[0].ToString().ToUpper() : "";
-    var lastInitial = !string.IsNullOrWhiteSpace(Model.LastName) ? Model.LastName[0].ToString().ToUpper() : "";
-    var avatarText = $"{firstInitial}{lastInitial}";
+    var avatarText = "";
+    if (!string.IsNullOrWhiteSpace(Model.FirstName))
+    {
+        avatarText += Model.FirstName[0].ToString().ToUpperInvariant();
+    }
+
+    if (!string.IsNullOrWhiteSpace(Model.LastName))
+    {
+        avatarText += Model.LastName[0].ToString().ToUpperInvariant();
+    }
+
     if (string.IsNullOrWhiteSpace(avatarText))
     {
         avatarText = !string.IsNullOrWhiteSpace(Model.Login)
-            ? Model.Login.Substring(0, 1).ToUpper()
+            ? Model.Login.Substring(0, 1).ToUpperInvariant()
             : "U";
     }
 
     var aboutText = string.IsNullOrWhiteSpace(Model.AboutMe)
-        ? "Здесь пока нет описания. Его можно добавить на странице редактирования профиля."
+        ? "Пока описание не заполнено. Его можно добавить в настройках профиля."
         : Model.AboutMe;
+
+    var filledFields = 0;
+    if (!string.IsNullOrWhiteSpace(Model.FirstName)) { filledFields++; }
+    if (!string.IsNullOrWhiteSpace(Model.LastName)) { filledFields++; }
+    if (!string.IsNullOrWhiteSpace(Model.Email)) { filledFields++; }
+    if (!string.IsNullOrWhiteSpace(Model.Phone)) { filledFields++; }
+    if (!string.IsNullOrWhiteSpace(Model.AboutMe)) { filledFields++; }
+    if (!string.IsNullOrWhiteSpace(Model.ThemeKey)) { filledFields++; }
+
+    var completionPercent = (int)Math.Round(filledFields / 6.0 * 100);
+
+    var contactsCount = 0;
+    if (!string.IsNullOrWhiteSpace(Model.Email)) { contactsCount++; }
+    if (!string.IsNullOrWhiteSpace(Model.Phone)) { contactsCount++; }
+
+    var aboutLength = string.IsNullOrWhiteSpace(Model.AboutMe) ? 0 : Model.AboutMe.Trim().Length;
 }
 
-<div class="profile-page">
-    <div class="profile-shell">
+<div class="page-shell profile-page">
+    <section class="page-header">
+        <div>
+            <div class="page-eyebrow">Личный профиль</div>
+            <h1 class="page-title">@fullName</h1>
+            <p class="page-subtitle">
+                Профиль пользователя @("@"+Model.Login). Здесь осталась только основная информация об аккаунте,
+                а переходы между разделами вынесены в общую навигацию.
+            </p>
+        </div>
 
-        <section class="profile-hero">
-            <div class="profile-cover"></div>
+        <div class="page-actions">
+            <span class="header-badge">Тема: @Model.ThemeKey</span>
+            <a asp-page="/EditProfile" class="btn btn-primary-solid">Редактировать профиль</a>
+        </div>
+    </section>
 
-            <div class="profile-main">
-                <div class="profile-avatar">@avatarText</div>
+    <section class="profile-overview">
+        <div class="surface-card profile-summary-card">
+            <div class="profile-avatar">@avatarText</div>
 
-                <div class="profile-head-content">
-                    <div class="profile-name-row">
+            <div class="profile-summary-copy">
+                <span class="pill">Профиль заполнен на @completionPercent%</span>
+                <p class="profile-summary-text">@aboutText</p>
+            </div>
+        </div>
+
+        <div class="profile-highlights">
+            <div class="surface-card highlight-card">
+                <div class="highlight-label">Заполненных блоков</div>
+                <div class="highlight-value">@filledFields/6</div>
+                <div class="muted-text">Имя, фамилия, контакты, описание и тема</div>
+            </div>
+
+            <div class="surface-card highlight-card">
+                <div class="highlight-label">Контактов указано</div>
+                <div class="highlight-value">@contactsCount</div>
+                <div class="muted-text">Email и телефон учитываются отдельно</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="profile-layout">
+        <aside class="profile-sidebar">
+            <div class="surface-card">
+                <h2 class="card-title">Основная информация</h2>
+
+                <div class="info-list">
+                    <div class="info-row">
+                        <span class="info-label">Имя</span>
+                        <span class="info-value">@(string.IsNullOrWhiteSpace(Model.FirstName) ? "Не указано" : Model.FirstName)</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Фамилия</span>
+                        <span class="info-value">@(string.IsNullOrWhiteSpace(Model.LastName) ? "Не указано" : Model.LastName)</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Логин</span>
+                        <span class="info-value">@Model.Login</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Email</span>
+                        <span class="info-value">@(string.IsNullOrWhiteSpace(Model.Email) ? "Не указан" : Model.Email)</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Телефон</span>
+                        <span class="info-value">@(string.IsNullOrWhiteSpace(Model.Phone) ? "Не указан" : Model.Phone)</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Тема</span>
+                        <span class="info-value">@Model.ThemeKey</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="surface-card">
+                <h2 class="card-title">Что можно изменить</h2>
+                <p class="card-text">
+                    В настройках профиля можно обновить логин, контакты, описание и тему оформления.
+                </p>
+
+                <div class="profile-logout-form">
+                    <a asp-page="/EditProfile" class="btn btn-outline btn-full">Перейти к настройкам</a>
+                </div>
+            </div>
+        </aside>
+
+        <section class="profile-main-column">
+            <div class="surface-card">
+                <div class="section-header">
+                    <h2 class="card-title">О себе</h2>
+                    <span class="pill">Символов: @aboutLength</span>
+                </div>
+
+                <p class="about-copy">@aboutText</p>
+            </div>
+
+            <div class="surface-card">
+                <h2 class="card-title">Состояние профиля</h2>
+
+                <div class="profile-checklist">
+                    <div class="checklist-item">
+                        <span class="checklist-dot @(string.IsNullOrWhiteSpace(Model.Email) ? "is-muted" : "is-ready")"></span>
                         <div>
-                            <h1 class="profile-name">@fullName</h1>
-                            <div class="profile-login">@@@Model.Login</div>
-                        </div>
-
-                        <div class="profile-actions">
-                            <a asp-page="/EditProfile" class="btn btn-light">Редактировать</a>
-                            <a asp-page="/Messages" class="btn btn-outline">Сообщения</a>
-                            <a asp-page="/Photos" class="btn btn-outline">Фото</a>
+                            <div class="checklist-title">Контактный email</div>
+                            <div class="muted-text">@(string.IsNullOrWhiteSpace(Model.Email) ? "Добавьте email для полного профиля." : "Email указан и отображается в профиле.")</div>
                         </div>
                     </div>
 
-                    <p class="profile-status">
-                        @aboutText
-                    </p>
+                    <div class="checklist-item">
+                        <span class="checklist-dot @(string.IsNullOrWhiteSpace(Model.Phone) ? "is-muted" : "is-ready")"></span>
+                        <div>
+                            <div class="checklist-title">Телефон</div>
+                            <div class="muted-text">@(string.IsNullOrWhiteSpace(Model.Phone) ? "Телефон пока не заполнен." : "Телефон добавлен в профиль.")</div>
+                        </div>
+                    </div>
 
-                    <div class="profile-stats">
-                        <div class="stat-card">
-                            <div class="stat-value">248</div>
-                            <div class="stat-label">Друзей</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value">54</div>
-                            <div class="stat-label">Фото</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value">19</div>
-                            <div class="stat-label">Подписок</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value">6</div>
-                            <div class="stat-label">Постов</div>
+                    <div class="checklist-item">
+                        <span class="checklist-dot @(string.IsNullOrWhiteSpace(Model.AboutMe) ? "is-muted" : "is-ready")"></span>
+                        <div>
+                            <div class="checklist-title">Описание профиля</div>
+                            <div class="muted-text">@(string.IsNullOrWhiteSpace(Model.AboutMe) ? "Расскажите немного о себе, чтобы страница не была пустой." : "Блок \"О себе\" заполнен.")</div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-
-        <div class="profile-content">
-            <aside class="profile-sidebar">
-                <div class="info-card">
-                    <h2 class="card-title">Основная информация</h2>
-
-                    <div class="info-list">
-                        <div class="info-row">
-                            <span class="info-label">Имя</span>
-                            <span class="info-value">@Model.FirstName</span>
-                        </div>
-
-                        <div class="info-row">
-                            <span class="info-label">Фамилия</span>
-                            <span class="info-value">@Model.LastName</span>
-                        </div>
-
-                        <div class="info-row">
-                            <span class="info-label">Логин</span>
-                            <span class="info-value">@Model.Login</span>
-                        </div>
-
-                        <div class="info-row">
-                            <span class="info-label">Email</span>
-                            <span class="info-value">@Model.Email</span>
-                        </div>
-
-                        <div class="info-row">
-                            <span class="info-label">Телефон</span>
-                            <span class="info-value">@Model.Phone</span>
-                        </div>
-
-                        <div class="info-row">
-                            <span class="info-label">Тема</span>
-                            <span class="info-value">@Model.ThemeKey</span>
-                        </div>
-                    </div>
-
-                    <div class="info-card">
-                        <h2 class="card-title">Разделы</h2>
-
-                        <div class="profile-actions">
-                            <a asp-page="/Messages" class="btn btn-outline">Сообщения</a>
-                            <a asp-page="/Photos" class="btn btn-outline">Фото</a>
-                            <a asp-page="/EditProfile" class="btn btn-outline">Редактировать профиль</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="info-card">
-                    <h2 class="card-title">О себе</h2>
-                    <p class="about-text">
-                        @aboutText
-                    </p>
-                </div>
-
-                <div class="info-card">
-                    <form method="post" asp-page-handler="Logout">
-                        <button class="btn btn-danger btn-full" type="submit">Выйти из аккаунта</button>
-                    </form>
-                </div>
-            </aside>
-
-            <section class="profile-feed">
-                <div class="feed-card">
-                    <div class="feed-card-header">
-                        <h2 class="card-title">Последние публикации</h2>
-                        <a href="#" class="feed-link">Все записи</a>
-                    </div>
-
-                    <div class="post-card">
-                        <div class="post-top">
-                            <div class="post-mini-avatar">@avatarText</div>
-                            <div>
-                                <div class="post-author">@fullName</div>
-                                <div class="post-date">сегодня в 12:40</div>
-                            </div>
-                        </div>
-
-                        <p class="post-text">
-                            Это пример поста пользователя. Здесь можно показывать текст публикации,
-                            изображения, прикрепленные файлы, лайки и комментарии.
-                        </p>
-
-                        <div class="post-actions">
-                            <button type="button" class="post-btn">Нравится</button>
-                            <button type="button" class="post-btn">Комментировать</button>
-                            <button type="button" class="post-btn">Поделиться</button>
-                        </div>
-                    </div>
-
-                    <div class="post-card">
-                        <div class="post-top">
-                            <div class="post-mini-avatar">@avatarText</div>
-                            <div>
-                                <div class="post-author">@fullName</div>
-                                <div class="post-date">вчера в 18:05</div>
-                            </div>
-                        </div>
-
-                        <p class="post-text">
-                            Еще один демонстрационный блок. Потом сюда можно подгрузить реальные посты
-                            из БД через отдельную таблицу публикаций.
-                        </p>
-
-                        <div class="post-actions">
-                            <button type="button" class="post-btn">Нравится</button>
-                            <button type="button" class="post-btn">Комментировать</button>
-                            <button type="button" class="post-btn">Поделиться</button>
-
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
     </div>
 </div>
 

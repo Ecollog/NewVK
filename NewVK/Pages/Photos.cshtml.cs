@@ -1,6 +1,7 @@
-using Microsoft.AspNetCore.Authorization;
+ï»¿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using SixLabors.ImageSharp;
 using NewVK.Data;
 using NewVK.Models;
 using NewVK.Services;
@@ -29,17 +30,20 @@ namespace NewVK.Pages
         private readonly UsersRepository _usersRepository;
         private readonly UserPhotosRepository _userPhotosRepository;
         private readonly IWebHostEnvironment _environment;
+        private readonly UploadedImageWebpService _uploadedImageWebpService;
 
         public PhotosModel(
             CurrentUserService currentUserService,
             UsersRepository usersRepository,
             UserPhotosRepository userPhotosRepository,
-            IWebHostEnvironment environment)
+            IWebHostEnvironment environment,
+            UploadedImageWebpService uploadedImageWebpService)
         {
             _currentUserService = currentUserService;
             _usersRepository = usersRepository;
             _userPhotosRepository = userPhotosRepository;
             _environment = environment;
+            _uploadedImageWebpService = uploadedImageWebpService;
         }
 
         [BindProperty]
@@ -74,47 +78,57 @@ namespace NewVK.Pages
 
             if (UploadFile is null || UploadFile.Length == 0)
             {
-                ErrorMessage = "Âûáåðèòå ôàéë äëÿ çàãðóçêè.";
+                ErrorMessage = "Ð’Ñ‹Ð±ÐµÑ€Ð¸Ñ‚Ðµ Ñ„Ð°Ð¹Ð» Ð´Ð»Ñ Ð·Ð°Ð³Ñ€ÑƒÐ·ÐºÐ¸.";
                 return RedirectToPage();
             }
 
             if (UploadFile.Length > MaxFileSize)
             {
-                ErrorMessage = "Ôàéë ñëèøêîì áîëüøîé. Ìàêñèìóì 5 ÌÁ.";
+                ErrorMessage = "Ð¤Ð°Ð¹Ð» ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ Ð±Ð¾Ð»ÑŒÑˆÐ¾Ð¹. ÐœÐ°ÐºÑÐ¸Ð¼ÑƒÐ¼ 5 ÐœÐ‘.";
                 return RedirectToPage();
             }
 
             string extension = Path.GetExtension(UploadFile.FileName);
             if (!AllowedExtensions.Contains(extension) || !AllowedContentTypes.Contains(UploadFile.ContentType))
             {
-                ErrorMessage = "Ðàçðåøåíû òîëüêî èçîáðàæåíèÿ: JPG, PNG, WEBP, GIF.";
+                ErrorMessage = "Ð Ð°Ð·Ñ€ÐµÑˆÐµÐ½Ñ‹ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð¸Ð·Ð¾Ð±Ñ€Ð°Ð¶ÐµÐ½Ð¸Ñ: JPG, PNG, WEBP, GIF.";
                 return RedirectToPage();
             }
 
-            string uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "photos");
-            Directory.CreateDirectory(uploadsFolder);
-
-            string storedFileName = $"{Guid.NewGuid():N}{extension.ToLowerInvariant()}";
-            string physicalPath = Path.Combine(uploadsFolder, storedFileName);
-
-            await using (var stream = System.IO.File.Create(physicalPath))
+            ProcessedImageFile processedImage;
+            try
             {
-                await UploadFile.CopyToAsync(stream, cancellationToken);
+                string uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "photos");
+                processedImage = await _uploadedImageWebpService.ConvertAndSaveAsync(
+                    UploadFile,
+                    uploadsFolder,
+                    "uploads/photos",
+                    cancellationToken);
+            }
+            catch (UnknownImageFormatException)
+            {
+                ErrorMessage = "Ð¤Ð°Ð¹Ð» Ð½Ðµ ÑƒÐ´Ð°Ð»Ð¾ÑÑŒ Ñ€Ð°ÑÐ¿Ð¾Ð·Ð½Ð°Ñ‚ÑŒ ÐºÐ°Ðº Ð¸Ð·Ð¾Ð±Ñ€Ð°Ð¶ÐµÐ½Ð¸Ðµ.";
+                return RedirectToPage();
+            }
+            catch (InvalidImageContentException)
+            {
+                ErrorMessage = "Ð˜Ð·Ð¾Ð±Ñ€Ð°Ð¶ÐµÐ½Ð¸Ðµ Ð¿Ð¾Ð²Ñ€ÐµÐ¶Ð´ÐµÐ½Ð¾ Ð¸Ð»Ð¸ Ð¸Ð¼ÐµÐµÑ‚ Ð½ÐµÐ¿Ð¾Ð´Ð´ÐµÑ€Ð¶Ð¸Ð²Ð°ÐµÐ¼Ñ‹Ð¹ Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚.";
+                return RedirectToPage();
             }
 
             var photo = new UserPhoto
             {
                 UserId = userId.Value,
-                FileName = storedFileName,
+                FileName = processedImage.StoredFileName,
                 OriginalFileName = Path.GetFileName(UploadFile.FileName),
-                RelativeUrl = $"/uploads/photos/{storedFileName}",
-                ContentType = UploadFile.ContentType,
-                SizeBytes = UploadFile.Length
+                RelativeUrl = processedImage.RelativeUrl,
+                ContentType = processedImage.ContentType,
+                SizeBytes = processedImage.SizeBytes
             };
 
             await _userPhotosRepository.CreateAsync(photo, cancellationToken);
 
-            SuccessMessage = "Ôîòî çàãðóæåíî.";
+            SuccessMessage = "Ð¤Ð¾Ñ‚Ð¾ Ð·Ð°Ð³Ñ€ÑƒÐ¶ÐµÐ½Ð¾ Ð¸ ÑÐ¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¾ Ð² Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚Ðµ WEBP.";
             return RedirectToPage();
         }
 
@@ -127,7 +141,7 @@ namespace NewVK.Pages
             UserPhoto? photo = await _userPhotosRepository.GetByIdAsync(id, userId.Value, cancellationToken);
             if (photo is null)
             {
-                ErrorMessage = "Ôîòî íå íàéäåíî.";
+                ErrorMessage = "Ð¤Ð¾Ñ‚Ð¾ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾.";
                 return RedirectToPage();
             }
 
@@ -141,7 +155,7 @@ namespace NewVK.Pages
                 System.IO.File.Delete(physicalPath);
             }
 
-            SuccessMessage = deleted ? "Ôîòî óäàëåíî." : "Íå óäàëîñü óäàëèòü ôîòî.";
+            SuccessMessage = deleted ? "Ð¤Ð¾Ñ‚Ð¾ ÑƒÐ´Ð°Ð»ÐµÐ½Ð¾." : "ÐÐµ ÑƒÐ´Ð°Ð»Ð¾ÑÑŒ ÑƒÐ´Ð°Ð»Ð¸Ñ‚ÑŒ Ñ„Ð¾Ñ‚Ð¾.";
             return RedirectToPage();
         }
 
@@ -172,7 +186,7 @@ namespace NewVK.Pages
         private static string FormatSize(long bytes)
         {
             double size = bytes;
-            string[] units = { "Á", "ÊÁ", "ÌÁ", "ÃÁ" };
+            string[] units = { "Ð‘", "ÐšÐ‘", "ÐœÐ‘", "Ð“Ð‘" };
             int unitIndex = 0;
 
             while (size >= 1024 && unitIndex < units.Length - 1)

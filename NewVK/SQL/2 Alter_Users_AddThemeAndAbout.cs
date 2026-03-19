@@ -1,4 +1,4 @@
-﻿USE [NewVKDb];
+﻿/*USE [NewVKDb];
 GO
 
 IF COL_LENGTH('dbo.Users', 'AboutMe') IS NULL
@@ -19,4 +19,4 @@ GO
 UPDATE dbo.Users
 SET ThemeKey = N'earthy'
 WHERE ThemeKey IS NULL;
-GO
+GO*/

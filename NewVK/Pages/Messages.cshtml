@@ -1,109 +1,112 @@
-﻿@page
+@page
 @model NewVK.Pages.MessagesModel
 @{
     ViewData["Title"] = "Сообщения";
     var active = Model.ActiveDialog;
+    var currentUserLetter = string.IsNullOrWhiteSpace(Model.CurrentUserName)
+        ? "U"
+        : Model.CurrentUserName.Substring(0, 1).ToUpperInvariant();
 }
 
-<div class="messages-page">
-    <div class="messages-shell">
+<div class="page-shell messages-page">
+    <section class="page-header">
+        <div>
+            <div class="page-eyebrow">Коммуникации</div>
+            <h1 class="page-title">Сообщения</h1>
+            <p class="page-subtitle">
+                Список диалогов и окно активной переписки собраны на одной странице,
+                а навигация по сайту больше не дублируется внутри раздела.
+            </p>
+        </div>
 
-        <section class="messages-hero">
-            <div class="messages-cover"></div>
-
-            <div class="messages-main">
-                <div class="messages-avatar">
-                    @Model.CurrentUserName.Substring(0, 1).ToUpper()
-                </div>
-
-                <div class="messages-head-content">
-                    <div class="messages-name-row">
-                        <div>
-                            <h1 class="messages-title">Сообщения</h1>
-                            <div class="messages-subtitle">Диалоги пользователя @Model.CurrentUserLogin</div>
-                        </div>
-
-                        <div class="messages-actions">
-                            <a asp-page="/Profile" class="btn btn-outline">Профиль</a>
-                            <a asp-page="/Photos" class="btn btn-outline">Фото</a>
-                            <a asp-page="/EditProfile" class="btn btn-light">Редактировать</a>
-                        </div>
-                    </div>
+        <div class="page-actions">
+            <div class="header-user-badge">
+                <div class="header-user-avatar">@currentUserLetter</div>
+                <div>
+                    <div class="header-user-name">@Model.CurrentUserName</div>
+                    <div class="header-user-login">@@@Model.CurrentUserLogin</div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <div class="messages-layout">
-            <aside class="dialogs-panel">
-                <div class="panel-card">
-                    <div class="panel-header">
-                        <h2 class="card-title">Диалоги</h2>
-                    </div>
-
-                    <div class="dialogs-list">
-                        @foreach (var dialog in Model.Dialogs)
-                        {
-                            var isActive = dialog.Id == Model.ActiveChatId;
-
-                            <a asp-page="/Messages"
-                               asp-route-chat="@dialog.Id"
-                               class="dialog-item @(isActive ? "active" : "")">
-                                <div class="dialog-avatar">@dialog.UserName.Substring(0, 1).ToUpper()</div>
-
-                                <div class="dialog-body">
-                                    <div class="dialog-top">
-                                        <span class="dialog-name">@dialog.UserName</span>
-                                        <span class="dialog-time">@dialog.LastTime</span>
-                                    </div>
-
-                                    <div class="dialog-preview">@dialog.Preview</div>
-                                </div>
-
-                                @if (dialog.UnreadCount > 0)
-                                {
-                                    <span class="dialog-badge">@dialog.UnreadCount</span>
-                                }
-                            </a>
-                        }
-                    </div>
+    <div class="messages-layout">
+        <aside class="dialogs-panel">
+            <div class="surface-card">
+                <div class="panel-header">
+                    <h2 class="card-title">Диалоги</h2>
+                    <span class="pill">Всего: @Model.Dialogs.Count</span>
                 </div>
-            </aside>
 
-            <section class="chat-panel">
-                <div class="panel-card chat-card">
-                    @if (active is not null)
+                <div class="dialogs-list">
+                    @foreach (var dialog in Model.Dialogs)
                     {
-                        <div class="chat-header">
-                            <div class="chat-user">
-                                <div class="chat-user-avatar">@active.UserName.Substring(0, 1).ToUpper()</div>
-                                <div>
-                                    <div class="chat-user-name">@active.UserName</div>
-                                    <div class="chat-user-handle">@active.UserHandle</div>
-                                </div>
-                            </div>
-                        </div>
+                        var isActive = dialog.Id == Model.ActiveChatId;
 
-                        <div class="chat-messages">
-                            @foreach (var message in active.Messages)
+                        <a asp-page="/Messages"
+                           asp-route-chat="@dialog.Id"
+                           class="dialog-item @(isActive ? "active" : "")">
+                            <div class="dialog-avatar">@dialog.UserName.Substring(0, 1).ToUpperInvariant()</div>
+
+                            <div class="dialog-body">
+                                <div class="dialog-top">
+                                    <span class="dialog-name">@dialog.UserName</span>
+                                    <span class="dialog-time">@dialog.LastTime</span>
+                                </div>
+
+                                <div class="dialog-preview">@dialog.Preview</div>
+                            </div>
+
+                            @if (dialog.UnreadCount > 0)
                             {
-                                <div class="message-row @(message.IsMine ? "mine" : "other")">
-                                    <div class="message-bubble">
-                                        <div class="message-text">@message.Text</div>
-                                        <div class="message-time">@message.Time</div>
-                                    </div>
-                                </div>
+                                <span class="dialog-badge">@dialog.UnreadCount</span>
                             }
-                        </div>
-
-                        <div class="chat-compose">
-                            <div class="compose-note">
-                                Сейчас это UI-заготовка страницы сообщений. В следующем шаге можно подключить реальные таблицы диалогов и сообщений.
-                            </div>
-                        </div>
+                        </a>
                     }
                 </div>
-            </section>
-        </div>
+            </div>
+        </aside>
+
+        <section class="chat-panel">
+            <div class="surface-card chat-card">
+                @if (active is not null)
+                {
+                    <div class="chat-header">
+                        <div class="chat-user">
+                            <div class="chat-user-avatar">@active.UserName.Substring(0, 1).ToUpperInvariant()</div>
+                            <div>
+                                <div class="chat-user-name">@active.UserName</div>
+                                <div class="chat-user-handle">@active.UserHandle</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-messages">
+                        @foreach (var message in active.Messages)
+                        {
+                            <div class="message-row @(message.IsMine ? "mine" : "other")">
+                                <div class="message-bubble">
+                                    <div class="message-text">@message.Text</div>
+                                    <div class="message-time">@message.Time</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="chat-compose">
+                        <div class="compose-note">
+                            Сейчас это демонстрационный интерфейс сообщений. Следующим шагом сюда можно подключить реальные таблицы диалогов и сообщений.
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        Для отображения переписки пока нет активного диалога.
+                    </div>
+                }
+            </div>
+        </section>
     </div>
 </div>
 

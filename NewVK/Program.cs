@@ -37,6 +37,7 @@ namespace NewVK
             builder.Services.AddScoped<UserPhotosRepository>();
             builder.Services.AddScoped<CurrentUserService>();
             builder.Services.AddScoped<AuthCookieService>();
+            builder.Services.AddScoped<UploadedImageWebpService>();
             builder.Services.AddSingleton<PasswordHasher>();
             builder.Services.AddSingleton<ThemeCatalogService>();
             

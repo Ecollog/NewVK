@@ -1,4 +1,4 @@
-﻿IF DB_ID(N'NewVKDb') IS NULL
+﻿/*IF DB_ID(N'NewVKDb') IS NULL
 BEGIN
     CREATE DATABASE [NewVKDb];
 END
@@ -40,4 +40,4 @@ BEGIN
     CREATE UNIQUE INDEX UX_Users_NormalizedEmail
         ON dbo.Users(NormalizedEmail);
 END
-GO
+GO*/

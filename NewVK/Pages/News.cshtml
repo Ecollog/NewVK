@@ -1,0 +1,84 @@
+@page
+@model NewVK.Pages.NewsModel
+@{
+    ViewData["Title"] = "Новости";
+}
+
+<div class="page-shell news-page">
+    <section class="page-header news-hero">
+        <div>
+            <div class="page-eyebrow">Обновления продукта</div>
+            <h1 class="page-title">Новости</h1>
+            <p class="page-subtitle">
+                Короткая редакционная лента по изменениям в NewVK: что обновилось в интерфейсе, где появились новые сценарии
+                и какие технические улучшения уже работают в фоне.
+            </p>
+        </div>
+
+        <div class="page-actions">
+            <span class="header-badge">Материалов: @Model.Stories.Count</span>
+            <span class="pill">Сегодня в фокусе: WEBP</span>
+        </div>
+    </section>
+
+    <section class="news-brief-grid">
+        @foreach (var item in Model.BriefItems)
+        {
+            <article class="surface-card brief-card">
+                <div class="brief-label">@item.Label</div>
+                <div class="brief-value">@item.Value</div>
+                <p class="brief-note">@item.Note</p>
+            </article>
+        }
+    </section>
+
+    <section class="news-content-grid">
+        <div class="news-feed">
+            @foreach (var story in Model.Stories)
+            {
+                <article class="surface-card news-story @story.Accent">
+                    <div class="story-meta">
+                        <span class="story-category">@story.Category</span>
+                        <span class="story-time">@story.PublishedAt</span>
+                    </div>
+
+                    <h2 class="story-title">@story.Title</h2>
+                    <p class="story-summary">@story.Summary</p>
+                </article>
+            }
+        </div>
+
+        <aside class="news-sidebar">
+            <div class="surface-card sidebar-highlight">
+                <div class="sidebar-kicker">Главный апдейт</div>
+                <h2 class="card-title">Оптимизация изображений теперь встроена в загрузку</h2>
+                <p class="card-text">
+                    Новый модуль принимает загруженный файл, очищает метаданные и сохраняет его в формате WEBP.
+                    Для пользователя процесс остается таким же простым, а хранилище расходуется заметно аккуратнее.
+                </p>
+            </div>
+
+            <div class="surface-card sidebar-list-card">
+                <h2 class="card-title">Что изменилось</h2>
+                <div class="news-checklist">
+                    <div class="news-check-item">
+                        <span class="news-check-dot"></span>
+                        <span>Появилась отдельная страница новостей.</span>
+                    </div>
+                    <div class="news-check-item">
+                        <span class="news-check-dot"></span>
+                        <span>В левое меню добавлен переход в новый раздел.</span>
+                    </div>
+                    <div class="news-check-item">
+                        <span class="news-check-dot"></span>
+                        <span>Новые фотографии сохраняются уже в WEBP.</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </section>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/news.css" asp-append-version="true" />
+}

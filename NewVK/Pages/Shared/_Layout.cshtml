@@ -1,10 +1,40 @@
 ﻿@using NewVK.Models
 @using NewVK.Services
+@using System.Security.Claims
 @inject ThemeCatalogService ThemeCatalogService
 
 @{
     var themeKey = User.FindFirst(AuthCookieService.ThemeClaimType)?.Value ?? SiteThemeDefaults.DefaultKey;
     var theme = ThemeCatalogService.GetByKeyOrDefault(themeKey);
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+    var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
+    var login = User.Identity?.Name ?? "guest";
+    var firstName = User.FindFirst(ClaimTypes.GivenName)?.Value ?? "";
+    var lastName = User.FindFirst(ClaimTypes.Surname)?.Value ?? "";
+    var fullName = $"{firstName} {lastName}".Trim();
+
+    if (string.IsNullOrWhiteSpace(fullName))
+    {
+        fullName = login;
+    }
+
+    var initials = "";
+    if (!string.IsNullOrWhiteSpace(firstName))
+    {
+        initials += firstName[0].ToString().ToUpperInvariant();
+    }
+
+    if (!string.IsNullOrWhiteSpace(lastName))
+    {
+        initials += lastName[0].ToString().ToUpperInvariant();
+    }
+
+    if (string.IsNullOrWhiteSpace(initials))
+    {
+        initials = !string.IsNullOrWhiteSpace(login)
+            ? login[0].ToString().ToUpperInvariant()
+            : "U";
+    }
 }
 
 <!DOCTYPE html>
@@ -34,22 +64,59 @@
 
     @await RenderSectionAsync("Styles", required: false)
 </head>
-<body data-user-theme="@theme.Key">
-    <header>
-    </header>
+<body class="@(isAuthenticated ? "app-body" : "public-body")" data-user-theme="@theme.Key">
+    @if (isAuthenticated)
+    {
+        <div class="app-shell">
+            <aside class="app-sidebar">
+                <a asp-page="/Profile" class="app-brand">NewVK</a>
+                <p class="app-brand-text">
+                    Единая навигация и аккуратные страницы без повторяющихся элементов.
+                </p>
 
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+                <div class="sidebar-user-card">
+                    <div class="sidebar-avatar">@initials</div>
+                    <div class="sidebar-user-meta">
+                        <div class="sidebar-user-name">@fullName</div>
+                        <div class="sidebar-user-login">@@@login</div>
+                    </div>
+                </div>
 
-    <footer>
-    </footer>
+                <nav class="app-nav" aria-label="Основная навигация">
+                    <a asp-page="/Profile" class="app-nav-link @(string.Equals(currentPage, "/Profile", StringComparison.OrdinalIgnoreCase) ? "active" : "")">Профиль</a>
+                    <a asp-page="/News" class="app-nav-link @(string.Equals(currentPage, "/News", StringComparison.OrdinalIgnoreCase) ? "active" : "")">Новости</a>
+                    <a asp-page="/Photos" class="app-nav-link @(string.Equals(currentPage, "/Photos", StringComparison.OrdinalIgnoreCase) ? "active" : "")">Фотографии</a>
+                    <a asp-page="/Messages" class="app-nav-link @(string.Equals(currentPage, "/Messages", StringComparison.OrdinalIgnoreCase) ? "active" : "")">Сообщения</a>
+                    <a asp-page="/EditProfile" class="app-nav-link @(string.Equals(currentPage, "/EditProfile", StringComparison.OrdinalIgnoreCase) ? "active" : "")">Настройки профиля</a>
+                </nav>
+
+                <div class="sidebar-footer">
+                    <div class="sidebar-theme-note">
+                        Активная тема: <strong>@theme.Name</strong>
+                    </div>
+
+                    <form method="post" asp-page="/Profile" asp-page-handler="Logout">
+                        <button type="submit" class="btn btn-outline btn-full">Выйти из аккаунта</button>
+                    </form>
+                </div>
+            </aside>
+
+            <main role="main" class="app-main">
+                @RenderBody()
+            </main>
+        </div>
+    }
+    else
+    {
+        <div class="public-shell">
+            <main role="main" class="public-main">
+                @RenderBody()
+            </main>
+        </div>
+    }
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/theme-loader.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)

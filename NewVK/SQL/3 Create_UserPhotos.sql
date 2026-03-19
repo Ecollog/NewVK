@@ -1,4 +1,4 @@
-﻿USE [NewVKDb];
+﻿/*USE [NewVKDb];
 GO
 
 IF OBJECT_ID(N'dbo.UserPhotos', N'U') IS NULL
